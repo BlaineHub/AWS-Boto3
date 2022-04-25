@@ -13,17 +13,10 @@ my_inst_ob.wait_until_running() #Resource waits for 200s, then error. (40x5)
 print('Now your instance is running')
 '''
 
-'''
-print('starting instance')
-ec2_client.start_instances(InstanceIds=['i-0c6d2ef6115ef773f'])
-waiter=ec2_client.get_waiter('instance_running') (40x15 nearly 10mins)
-waiter.wait(InstanceIds=['i-0c6d2ef6115ef773f'])
-print('Your instance is now running')
-'''
 my_inst_ob=ec2_resource.Instance('i-0c6d2ef6115ef773f')
 print('starting given instance....')
 my_inst_ob.start()
-waiter=ec2_client.get_waiter('instance_running')
+waiter=ec2_client.get_waiter('instance_running')   #(40x15 nearly 10mins)
 waiter.wait(InstanceIds=['i-0c6d2ef6115ef773f'])
 print('Your instance is now running')
 
