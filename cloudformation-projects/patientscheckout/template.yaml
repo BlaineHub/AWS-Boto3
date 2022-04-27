@@ -1,0 +1,84 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  patientscheckout
+
+  Sample SAM Template for patientscheckout
+
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  PatientCheckoutDLQ:
+    Type: AWS::SNS::Topic
+  PatientCheckoutTopic:
+    Type: AWS::SNS::Topic
+  PatientCheckoutBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-${AWS::AccountId}-${AWS::Region}
+  PatientCheckoutFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: patients_checkout/
+      Handler: patientcheckout.lambda_handler
+      Runtime: python3.9
+      EventInvokeConfig:
+        MaximumRetryAttempts: 0
+      DeadLetterQueue:
+        Type: SNS
+        TargetArn: !Ref PatientCheckoutDLQ
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Sub ${AWS::StackName}-${AWS::AccountId}-${AWS::Region}
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt PatientCheckoutTopic.TopicName
+            TopicName: !GetAtt PatientCheckoutDLQ.TopicName
+      Environment:
+        Variables:
+          PATIENT_CHECKOUT_TOPIC: !Ref PatientCheckoutTopic
+      Events:
+        S3Event:
+          Type: S3 
+          Properties:
+            Bucket: !Ref PatientCheckoutBucket
+            Events: s3:ObjectCreated:*
+  BillManagementFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: patients_checkout/
+      Handler: billmanagement.lambda_handler
+      Runtime: python3.9
+      Events:
+        SNSEvent:
+          Type: SNS
+          Properties:
+            Topic: !Ref PatientCheckoutTopic
+  ClaimManagementFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: patients_checkout/
+      Handler: claimmanagement.lambda_handler
+      Runtime: python3.9
+      Events:
+        ClaimEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt ClaimManagementQueue.Arn
+            BatchSize: 10
+  ErrorHandlerFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: patients_checkout/
+      Handler: errorhandler.lambda_handler
+      Runtime: python3.9
+      Events:
+        SNSEvent:
+          Type: SNS
+          Properties:
+            Topic: !Ref PatientCheckoutDLQ
+  ClaimManagementQueue:
+    Type: AWS::SQS::Queue
+  
+      
