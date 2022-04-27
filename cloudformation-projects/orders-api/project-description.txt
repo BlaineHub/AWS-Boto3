@@ -1,0 +1,5 @@
+Serverless api project (Sycronous Function)
+
+step1) 2 API Gateway Endpoints for Posting/Getting 
+step2) 2 Lambda function triggered by API Gateway Method
+step3) DynamoDb NoSql table to store the data.
