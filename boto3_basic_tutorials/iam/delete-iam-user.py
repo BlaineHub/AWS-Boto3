@@ -15,7 +15,8 @@ acckey = []
 for data in iam_client.list_access_keys(UserName=username)['AccessKeyMetadata']:
     acckey.append(data['AccessKeyId'])
 try: 
-    iam_client.detach_user_policy(UserName=iam_user_ob.user_name,PolicyArn=pol[0])
+    for p in pol:
+        iam_client.detach_user_policy(UserName=iam_user_ob.user_name,PolicyArn=p)
 except Exception:
     pass
 try: 
