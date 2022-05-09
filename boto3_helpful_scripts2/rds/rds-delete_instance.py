@@ -3,9 +3,9 @@ import boto3
 
 rds_client = boto3.client('rds')
 response = rds_client.delete_db_instance(
-    DBInstanceIdentifier = 'mariadb',
+    DBInstanceIdentifier = 'blogdb',
     SkipFinalSnapshot=False,
-    FinalDBSnapshotIdentifier = 'mariadb-final-snapshot',
+    FinalDBSnapshotIdentifier = 'blogdb-final-snapshot',
     DeleteAutomatedBackups = True
 )
 pprint(response)

@@ -2,13 +2,14 @@ import mysql.connector as mc
 
 try: 
     db = mc.connect(
-            host='blainedb.cmugpmb5tbfm.us-east-1.rds.amazonaws.com',
+            host='blogdb.cmugpmb5tbfm.us-east-1.rds.amazonaws.com',
             user='admin',
-            password='',
-            database='blainedb'
+            password='12345678',
+            database='blogdb'
         )
     cursor = db.cursor()
     cursor.execute('SHOW TABLES')
+    #SHOW DATABASES
 
     for table in cursor:
         print(table)
